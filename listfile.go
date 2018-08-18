@@ -1,8 +1,11 @@
 package main
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"github.com/urfave/cli"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -27,7 +30,12 @@ func main() {
 		cli.BoolFlag{
 			Name:   "showquation, q",
 			Hidden: false,
-			Usage:  "Out put the quation mark to field.",
+			Usage:  "Output the quation mark to field.",
+		},
+		cli.BoolFlag{
+			Name:   "showmd5, md5",
+			Hidden: false,
+			Usage:  "Output the file md5 code.",
 		},
 	}
 	app.Action = mainAction
@@ -50,13 +58,17 @@ func mainAction(c *cli.Context) error {
 	splitStr := c.String("split")
 	showSubname := c.Bool("showsubname")
 	showQuation := c.Bool("showquation")
+	showMD5 := c.Bool("showmd5")
 
-	listFilesAndDirs(inputPath, splitStr, showSubname, showQuation)
+	err := listFilesAndDirs(inputPath, splitStr, showSubname, showQuation, showMD5)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func listFilesAndDirs(dirPath string, splitStr string,
-	showSubname bool, showQuation bool) error {
+	showSubname bool, showQuation bool, showMD5 bool) error {
 	dir, err := ioutil.ReadDir(dirPath)
 	if err != nil {
 		fmt.Println(err)
@@ -77,8 +89,11 @@ func listFilesAndDirs(dirPath string, splitStr string,
 				dirPath = dirPath + pathSep
 			}
 
-			listFilesAndDirs(dirPath+fi.Name(),
-				splitStr, showSubname, showQuation)
+			err := listFilesAndDirs(dirPath+fi.Name(),
+				splitStr, showSubname, showQuation, showMD5)
+			if err != nil {
+				return err
+			}
 		} else { // process file
 			fileName := fi.Name()
 			currentPath := dirPath
@@ -86,10 +101,26 @@ func listFilesAndDirs(dirPath string, splitStr string,
 				fileName = surroundQuation(fileName)
 				currentPath = surroundQuation(dirPath)
 			}
-			fmt.Print(currentPath + splitStr + fileName + splitStr)
+			fmt.Print(currentPath)
+			fmt.Print(splitStr)
+			fmt.Print(fileName)
+			fmt.Print(splitStr)
 			fmt.Printf("%d", fi.Size())
 			fmt.Print(splitStr)
-			fmt.Printf("%v\n", fi.ModTime())
+			fmt.Printf("%v", fi.ModTime())
+
+			if showMD5 {
+				md5String, err := md5sum(dirPath + pathSep + fi.Name())
+				if err != nil {
+					return err
+				}
+				if showQuation {
+					md5String = surroundQuation(md5String)
+				}
+				fmt.Print(splitStr)
+				fmt.Print(md5String)
+			}
+			fmt.Printf("\n")
 		}
 	}
 	return nil
@@ -97,4 +128,26 @@ func listFilesAndDirs(dirPath string, splitStr string,
 
 func surroundQuation(inputName string) string {
 	return "\"" + inputName + "\""
+}
+
+func md5sum(inputFile string) (string, error) {
+
+	var returnMD5String string
+
+	file, err := os.Open(inputFile)
+	if err != nil {
+		return returnMD5String, err
+	}
+	defer file.Close()
+
+	hash := md5.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return returnMD5String, err
+	}
+
+	hashInBytes := hash.Sum(nil)[:16]
+	returnMD5String = hex.EncodeToString(hashInBytes)
+	// fmt.Printf("%x", h.Sum(nil))
+
+	return returnMD5String, nil
 }
