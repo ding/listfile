@@ -145,9 +145,6 @@ func md5sum(inputFile string) (string, error) {
 	}
 
 	returnMD5String = fmt.Sprintf("%x", hash.Sum(nil))
-	// hashInBytes := hash.Sum(nil)[:16]
-	// returnMD5String = hex.EncodeToString(hashInBytes)
-	// fmt.Printf("%x", h.Sum(nil))
 
 	return returnMD5String, nil
 }
