@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"github.com/urfave/cli"
 	"io"
@@ -145,8 +144,9 @@ func md5sum(inputFile string) (string, error) {
 		return returnMD5String, err
 	}
 
-	hashInBytes := hash.Sum(nil)[:16]
-	returnMD5String = hex.EncodeToString(hashInBytes)
+	returnMD5String = fmt.Sprintf("%x", hash.Sum(nil))
+	// hashInBytes := hash.Sum(nil)[:16]
+	// returnMD5String = hex.EncodeToString(hashInBytes)
 	// fmt.Printf("%x", h.Sum(nil))
 
 	return returnMD5String, nil
