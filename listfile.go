@@ -15,6 +15,13 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "List File"
 	app.Usage = "List all the file include the subfolders with simple format."
+	app.Version = "1.0.0"
+	app.Authors = []cli.Author{
+		cli.Author{
+			Name:  "Yong Ding",
+			Email: "yong.ding@hotmail.com",
+		},
+	}
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "split, s",
