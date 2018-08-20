@@ -39,7 +39,7 @@ func main() {
 			Usage:  "Output the quation mark to field.",
 		},
 		cli.BoolFlag{
-			Name:   "showmd5, md5",
+			Name:   "showmd5, m",
 			Hidden: false,
 			Usage:  "Output the file md5 code.",
 		},
