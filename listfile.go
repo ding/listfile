@@ -4,20 +4,21 @@ import (
 	"crypto/md5"
 	"crypto/sha256"
 	"fmt"
-	"github.com/urfave/cli"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/urfave/cli"
 )
 
 // Parameger struct
 type inputParameters struct {
-	splitStr    string
-	showSubname bool
-	showQuation bool
-	showMD5     bool
+	splitStr    string	// defin the split string
+	showSubname bool   
+	showQuation bool	// define whether to show quation
+	showMD5     bool	// define whether show MD5 code
 	showSHA256  bool
 }
 
